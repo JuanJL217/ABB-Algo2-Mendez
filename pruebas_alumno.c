@@ -6,6 +6,11 @@ int comparar_numeros(void* a, void* b)
 	return *(int*)a - *(int*)b;
 }
 
+int comparar_letras(void* a, void* b)
+{
+	return *(char*)a - *(char*)b;
+}
+
 void inicializarAbb()
 {
 	abb_t* abb = abb_crear(comparar_numeros);
@@ -102,6 +107,53 @@ void agregarMismoElemento()
 	return;
 }
 
+void eliminarRaizSinHijos()
+{
+	abb_t* abb = abb_crear(comparar_letras);
+	if (!abb)
+		return;
+	char* nombre = "Juan";
+	if (!abb_insertar(abb, (void*)nombre)) {
+		abb_destruir(abb);
+		return;
+	}
+	pa2m_afirmar(abb_cantidad(abb) == 1, "Se agregó un elemento en la raiz");
+	char* nombre_eliminar = "Juan";
+	char* nombre_quitado;
+	abb_quitar(abb, (void*)nombre_eliminar, (void**)&nombre_quitado);
+	pa2m_afirmar(nombre_quitado == nombre, "Se quitó un elemento, la direccion obtenida es: '%p' -> esperado: '%p'", nombre_quitado, nombre);
+	pa2m_afirmar(abb_cantidad(abb) == 0, "No hay elemento en el abb");
+	char* buscar_nombre = "Juan";
+	char* nombre_encontrado = abb_obtener(abb, (void*)&buscar_nombre);
+	pa2m_afirmar(nombre_encontrado == NULL, "No se encontró el elemento quitado en el abb");
+	free(abb);
+}
+
+void eliminarElementoSinHijos()
+{
+	abb_t* abb = abb_crear(comparar_letras);
+	if (!abb)
+		return;
+	char letras[] = {'c', 'a', 'd'};
+	for (size_t i = 0; i < 3; i++) {
+		if (!abb_insertar(abb, (void*)&letras[i])) {
+			abb_destruir(abb);
+			return;
+		}
+	}
+	pa2m_afirmar(abb_cantidad(abb) == 3, "El abb tiene 3 elementos");
+	char letra_eliminar = 'a';
+	char* letra_quitada;
+	char buscar_letra = 'a';
+	char* letra_encontrada;
+	abb_quitar(abb, (void*)&letra_eliminar, (void**)&letra_quitada);
+	pa2m_afirmar(letra_quitada == &letras[1], "Se quitó un elemento, la dirección obtenida es: '%p' -> esperado: '%p'", letra_quitada, &letras[1]);
+	pa2m_afirmar(abb_cantidad(abb) == 2, "Se eliminó un elemento, quedan 2 elementos en el abb");
+	letra_encontrada = abb_obtener(abb, (void*)&buscar_letra);
+	pa2m_afirmar(letra_encontrada == NULL, "No se encontró el elemento quitado en el abb");
+	abb_destruir_todo(abb, NULL);
+}
+
 bool mostrar_numeros(void* elemento, void* nada)
 {	
 	printf("%d ", *(int*)elemento);
@@ -144,6 +196,10 @@ int main()
 	agregarElementosVariados();
 	pa2m_nuevo_grupo("============== PRUEBA OBTENER ELEMENTOS ===============");
 	obtenerElementos();
+	pa2m_nuevo_grupo("============== PRUEBA ELIMINAR ELEMENTOS SIN HIJOS ===============");
+	eliminarRaizSinHijos();
+	eliminarElementoSinHijos();
+	pa2m_nuevo_grupo("============== PRUEBA ELIMINAR ELEMENTOS CON UN HIJO ===============");
 
 	pa2m_nuevo_grupo("============== PRUEBA ITERADOR POSTORDEN ==============");
 	iteradorIternoSinCorte();
