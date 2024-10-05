@@ -69,11 +69,6 @@ nodo_t** buscar_predecesor_inorden(nodo_t** nodo_actual)
     return buscar_predecesor_inorden(&((*nodo_actual)->der));
 }
 
-bool abb_esta_vacio(abb_t* abb)
-{
-    return abb->nodos == 0;
-}
-
 bool abb_insertar(abb_t *abb, void* elemento)
 {
     if (!abb)
@@ -83,20 +78,17 @@ bool abb_insertar(abb_t *abb, void* elemento)
     if (!nuevo_nodo) 
         return false;
 
-    if (abb_esta_vacio(abb)) {
-        abb->raiz = nuevo_nodo;
+    nodo_t** puntero_entre_padre_e_hijo = buscar_nodo(abb, &(abb->raiz), elemento);
+    if (!*puntero_entre_padre_e_hijo) {
+        (*puntero_entre_padre_e_hijo) = nuevo_nodo;
     } else {
-        nodo_t** puntero_entre_padre_e_hijo = buscar_nodo(abb, &(abb->raiz), elemento);
-        if (!*puntero_entre_padre_e_hijo) {
-            (*puntero_entre_padre_e_hijo) = nuevo_nodo;
-        } else {
-            nodo_t** nodo_encontrado = buscar_predecesor_inorden(&((*puntero_entre_padre_e_hijo)->izq));
-            if (!(*nodo_encontrado))
-                *nodo_encontrado = nuevo_nodo;
-            else
-                (*nodo_encontrado)->der = nuevo_nodo;
-        }
+        nodo_t** nodo_encontrado = buscar_predecesor_inorden(&((*puntero_entre_padre_e_hijo)->izq));
+        if (!(*nodo_encontrado))
+            *nodo_encontrado = nuevo_nodo;
+        else
+            (*nodo_encontrado)->der = nuevo_nodo;
     }
+
     abb->nodos++;
     return true;
 }
@@ -171,16 +163,18 @@ size_t abb_cantidad(abb_t* abb)
     return abb->nodos;
 }
 
-bool recorrido_inorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador)
+// INORDEN
+
+bool recorrido_inorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador, size_t cantidad_tope)
 {  
     if (!nodo_actual)
         return true;
-    if(!recorrido_inorden(nodo_actual->izq, f, ctx, contador))
+    if(!recorrido_inorden(nodo_actual->izq, f, ctx, contador, cantidad_tope))
         return false;
-    if (!f(nodo_actual->elemento, ctx))
+    if (cantidad_tope == *contador || !f(nodo_actual->elemento, ctx))
         return false;
     (*contador)++;
-    if (!recorrido_inorden(nodo_actual->der, f, ctx, contador))
+    if (!recorrido_inorden(nodo_actual->der, f, ctx, contador, cantidad_tope))
         return false;
     return true;
 }
@@ -190,9 +184,28 @@ size_t abb_iterar_inorden(abb_t* abb, bool (*f)(void*,void*), void* ctx)
     if(!abb)
         return 0;
     size_t cantidad_nodos_recorridos = 0;
-    if (!recorrido_inorden(abb->raiz, f, ctx, &cantidad_nodos_recorridos))
+    if (!recorrido_inorden(abb->raiz, f, ctx, &cantidad_nodos_recorridos, abb->nodos))
         return cantidad_nodos_recorridos+1;
     return abb->nodos;
+}
+
+bool asignar_puntero_a_vector(void* elemento, void* vector)
+{
+    void*** puntero_a_vector = (void***) vector;
+    **puntero_a_vector = elemento;
+    (*puntero_a_vector)++;
+    return true;
+}
+
+size_t abb_vectorizar_inorden(abb_t* abb, void** vector, size_t tamaño)
+{
+    if (!abb || !*vector)
+        return 0;
+    size_t cantidad_nodos_recorridos = 0;
+    if(!recorrido_inorden(abb->raiz, asignar_puntero_a_vector, &vector, &cantidad_nodos_recorridos, tamaño)) {
+        return cantidad_nodos_recorridos+1;
+    }
+    return cantidad_nodos_recorridos;
 }
 
 
@@ -242,11 +255,6 @@ size_t abb_iterar_postorden(abb_t* abb, bool (*f)(void*,void*), void* ctx)
         return cantidad_nodos_recorridos+1;
     return abb->nodos;
 }
-
-// size_t abb_vectorizar_inorden(abb_t* abb, void** vector, size_t tamaño)
-// {
-//     return 0;
-// }
 
 // size_t abb_vectorizar_preorden(abb_t* abb, void** vector, size_t tamaño)
 // {
