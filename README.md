@@ -6,7 +6,7 @@
 
 # ESTO ES UN TEMPLATE, COMPLETAR LO QUE HAGA FALTA, ELIMINAR LO QUE SOBRE (INCLUIDA ESTA LÍNEA)
 
-## Alumno: (Nombre Apellido) - (Padrón) - (Mail)
+## Alumno: Juan Ernesto Juarez Lezama - 110418 - jjuarez@gmail.com
 
 - Para compilar:
 
@@ -61,4 +61,37 @@ vector_original = vector;
 ---
 
 ## Respuestas a las preguntas teóricas
-Incluír acá las respuestas a las preguntas del enunciado (si aplica).
+
+-   Explique teóricamente (y utilizando gráficos) qué es una árbol, árbol
+    binario y árbol binario de búsqueda. Explique cómo funcionan, cuáles son sus
+    operaciones básicas (incluyendo el análisis de complejidad de cada una de
+    ellas) y por qué es importante la distinción de cada uno de estos diferentes
+    tipos de árboles. Ayúdese con diagramas para explicar.
+
+### Operaciones básicas: insertar, obtener y eliminar
+
+## Árbol
+
+## Arbol Binario
+
+## Árbol Binario de Busqueda
+
+## ¿Por qué es importante la distintición entre estos tipos de árboles?
+
+-   Explique la implementación de ABB realizada y las decisiones de diseño
+    tomadas (por ejemplo, si tal o cuál funciones fue planteada de forma
+    recursiva, iterativa o mixta y por qué, que dificultades encontró al manejar
+    los nodos y punteros, reservar y liberar memoria, etc).
+
+## Crear ABB
+
+## Insertar elemento
+
+## Quitar elemento
+
+## Obtener elemento
+
+## Recorridos:
+-Preorden
+-Inorden
+-Postorden

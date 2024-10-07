@@ -173,7 +173,7 @@ void iteradorIternoConCorte()
 	if (!abb)
 		return;
 	
-	int numeros[] = {10, -4, 2, 5, 8, 1, 13, -9};
+	int numeros[] = {10, -4, 2, 5, 7, 1, 13, -9};
 	for (size_t i = 0; i < 8; i++) {
 		if (!abb_insertar(abb, (void*)&numeros[i])) {
 			abb_destruir(abb);

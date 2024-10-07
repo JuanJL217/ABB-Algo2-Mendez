@@ -93,53 +93,46 @@ bool abb_insertar(abb_t *abb, void* elemento)
     return true;
 }
 
-void borrar_nodo_hoja(abb_t* abb, nodo_t** nodo_actual)
+void borrar_nodo_hoja(abb_t* abb, nodo_t** puntero_a_hijo)
 {   
-    free(*nodo_actual);
-    (*nodo_actual) = NULL;
+    (*puntero_a_hijo) = NULL;
 }
 
-void borrar_nodo_con_hijos(abb_t* abb, nodo_t** nodo_actual)
+void borrar_nodo_con_hijos(abb_t* abb, nodo_t** puntero_a_hijo)
 {   
-    nodo_t* nodo_guardado = *nodo_actual;
-    nodo_t** nodo_reemplazante = buscar_predecesor_inorden(&(*nodo_actual)->izq);
-    (*nodo_reemplazante)->izq = (*nodo_actual)->izq;
-    *nodo_actual = *nodo_reemplazante;
-    (*nodo_reemplazante)->der = NULL;
-    free(nodo_guardado);
+    nodo_t** nodo_reemplazo = buscar_predecesor_inorden(&(*puntero_a_hijo)->izq);
+    nodo_t* nodo_reemplazo_guardado = *nodo_reemplazo;
+    (*nodo_reemplazo) = (*nodo_reemplazo)->izq;
+    nodo_reemplazo_guardado->izq = (*puntero_a_hijo)->izq;
+    nodo_reemplazo_guardado->der = (*puntero_a_hijo)->der;
+    (*puntero_a_hijo) = nodo_reemplazo_guardado;
 }
 
-void borrar_nodo_con_un_hijo(abb_t* abb, nodo_t** nodo_actual)
+void borrar_nodo_con_un_hijo(abb_t* abb, nodo_t** puntero_a_hijo)
 {   
-    nodo_t* nodo_guardado = *nodo_actual;
-    if((*nodo_actual)->izq)
-        *nodo_actual = (*nodo_actual)->izq;
+    if ((*puntero_a_hijo)->izq)
+        *puntero_a_hijo = (*puntero_a_hijo)->izq;
     else
-        *nodo_actual = (*nodo_actual)->der;
-    free(nodo_guardado);
+        *puntero_a_hijo = (*puntero_a_hijo)->der;
 }
 
 bool abb_quitar(abb_t* abb, void* buscado, void** encontrado)
 {   
     if (!abb || !abb->raiz)
         return false;
-    
     nodo_t** puntero_entre_padre_e_hijo = buscar_nodo(abb, &(abb->raiz), buscado);
+    nodo_t* nodo_guardado = (*puntero_entre_padre_e_hijo);
     if (!*puntero_entre_padre_e_hijo)
         return false;
-
-    void* elemento_guardado = (*puntero_entre_padre_e_hijo)->elemento;
-
     if (!(*puntero_entre_padre_e_hijo)->izq && !(*puntero_entre_padre_e_hijo)->der)
         borrar_nodo_hoja(abb, puntero_entre_padre_e_hijo);
     else if ((*puntero_entre_padre_e_hijo)->izq && (*puntero_entre_padre_e_hijo)->der)
         borrar_nodo_con_hijos(abb, puntero_entre_padre_e_hijo);
     else
         borrar_nodo_con_un_hijo(abb, puntero_entre_padre_e_hijo);
-
     if (encontrado)
-        *encontrado = elemento_guardado;
-
+        *encontrado = nodo_guardado->elemento;
+    free(nodo_guardado);
     abb->nodos--;
     return true;
 }
@@ -149,43 +142,15 @@ void* abb_obtener(abb_t* abb, void* elemento)
 {
     if (!abb || !abb->raiz)
         return NULL;
-    
     nodo_t** puntero_entre_padre_e_hijo = buscar_nodo(abb, &(abb->raiz), elemento);
     if (!*puntero_entre_padre_e_hijo)
         return NULL;
-    
     return (*puntero_entre_padre_e_hijo)->elemento;
 }
 
 
 size_t abb_cantidad(abb_t* abb)
 {
-    return abb->nodos;
-}
-
-// INORDEN
-
-bool recorrido_inorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador, size_t cantidad_tope)
-{  
-    if (!nodo_actual)
-        return true;
-    if(!recorrido_inorden(nodo_actual->izq, f, ctx, contador, cantidad_tope))
-        return false;
-    if (cantidad_tope == *contador || !f(nodo_actual->elemento, ctx))
-        return false;
-    (*contador)++;
-    if (!recorrido_inorden(nodo_actual->der, f, ctx, contador, cantidad_tope))
-        return false;
-    return true;
-}
-
-size_t abb_iterar_inorden(abb_t* abb, bool (*f)(void*,void*), void* ctx)
-{
-    if(!abb)
-        return 0;
-    size_t cantidad_nodos_recorridos = 0;
-    if (!recorrido_inorden(abb->raiz, f, ctx, &cantidad_nodos_recorridos, abb->nodos))
-        return cantidad_nodos_recorridos+1;
     return abb->nodos;
 }
 
@@ -197,71 +162,96 @@ bool asignar_puntero_a_vector(void* elemento, void* vector)
     return true;
 }
 
+// INORDEN
+
+bool recorrido_inorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador, size_t tope)
+{  
+    if (!nodo_actual)
+        return true;
+    if(!recorrido_inorden(nodo_actual->izq, f, ctx, contador, tope))
+        return false;
+    if (tope == *contador || !f(nodo_actual->elemento, ctx))
+        return false;
+    (*contador)++;
+    if (!recorrido_inorden(nodo_actual->der, f, ctx, contador, tope))
+        return false;
+    return true;
+}
+
+size_t abb_iterar_inorden(abb_t* abb, bool (*f)(void*,void*), void* ctx)
+{
+    if(!abb || !f)
+        return 0;
+    size_t cantidad_iterados = 0;
+    return !recorrido_inorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos) ? cantidad_iterados+1 : abb->nodos;
+}
+
 size_t abb_vectorizar_inorden(abb_t* abb, void** vector, size_t tamaño)
 {
     if (!abb || !*vector)
         return 0;
-    size_t cantidad_nodos_recorridos = 0;
-    if(!recorrido_inorden(abb->raiz, asignar_puntero_a_vector, &vector, &cantidad_nodos_recorridos, tamaño)) {
-        return cantidad_nodos_recorridos+1;
-    }
-    return cantidad_nodos_recorridos;
+    size_t cantidad_iterados = 0;
+    return !recorrido_inorden(abb->raiz, asignar_puntero_a_vector, &vector, &cantidad_iterados, tamaño) ? cantidad_iterados+1 : abb->nodos;
 }
 
 
-bool recorrido_preorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador)
+// PREORDEN
+
+bool recorrido_preorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador, size_t tope)
 {
     if (!nodo_actual)
         return true;
-    if(!f(nodo_actual->elemento, ctx))
+    if(*contador == tope || !f(nodo_actual->elemento, ctx))
         return false;
     (*contador)++;
-    if (!recorrido_preorden(nodo_actual->izq, f, ctx, contador) || !recorrido_preorden(nodo_actual->der, f, ctx, contador))
+    if (!recorrido_preorden(nodo_actual->izq, f, ctx, contador, tope) || !recorrido_preorden(nodo_actual->der, f, ctx, contador, tope))
         return false;
     return true;
 }
+
 
 size_t abb_iterar_preorden(abb_t* abb, bool (*f)(void*,void*), void* ctx)
 {
     if (!abb)
         return 0;
-    size_t cantidad_nodos_recorridos = 0;
-    if (!recorrido_preorden(abb->raiz, f, ctx, &cantidad_nodos_recorridos))
-        return cantidad_nodos_recorridos+1;
-    return abb->nodos;
+    size_t cantidad_iterados = 0;
+    return !recorrido_preorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos) ? cantidad_iterados+1 : abb->nodos;
 }
 
+size_t abb_vectorizar_preorden(abb_t* abb, void** vector, size_t tamaño)
+{
+    if (!abb)
+        return 0;
+    size_t cantidad_iterados = 0;
+    return !recorrido_preorden(abb->raiz, asignar_puntero_a_vector, &vector, &cantidad_iterados, tamaño) ? cantidad_iterados+1 : abb->nodos;
+}
 
-bool recorrido_postorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador)
+// POSTORDEN
+
+bool recorrido_postorden(nodo_t* nodo_actual, bool (*f)(void*, void*), void* ctx, size_t* contador, size_t tope)
 {
     if (!nodo_actual)
         return true;
-    if (!recorrido_postorden(nodo_actual->izq, f, ctx, contador) || !recorrido_postorden(nodo_actual->der, f, ctx, contador))
+    if (!recorrido_postorden(nodo_actual->izq, f, ctx, contador, tope) || !recorrido_postorden(nodo_actual->der, f, ctx, contador, tope))
         return false;
-    if (!f(nodo_actual->elemento, ctx))
+    if (*contador == tope || !f(nodo_actual->elemento, ctx))
         return false;
     (*contador)++;
     return true;
 }
 
-
 size_t abb_iterar_postorden(abb_t* abb, bool (*f)(void*,void*), void* ctx)
 {
     if (!abb)
         return 0;
-    
-    size_t cantidad_nodos_recorridos = 0;
-    if (!recorrido_postorden(abb->raiz, f, ctx, &cantidad_nodos_recorridos))
-        return cantidad_nodos_recorridos+1;
-    return abb->nodos;
+    size_t cantidad_iterados = 0;
+    return !recorrido_postorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos) ? cantidad_iterados+1 : abb->nodos;
 }
 
-// size_t abb_vectorizar_preorden(abb_t* abb, void** vector, size_t tamaño)
-// {
-//     return 0;
-// }
-
-// size_t abb_vectorizar_postorden(abb_t* abb, void** vector, size_t tamaño)
-// {
-//     return 0;
-// }
+size_t abb_vectorizar_postorden(abb_t* abb, void** vector, size_t tamaño)
+{   
+    if (!abb)
+        return 0;
+    size_t cantidad_iterados = 0;
+    return !recorrido_postorden(abb->raiz, asignar_puntero_a_vector, &vector, &cantidad_iterados, tamaño) ? cantidad_iterados+1 : abb->nodos;
+}
