@@ -83,13 +83,36 @@ vector_original = vector;
     recursiva, iterativa o mixta y por qué, que dificultades encontró al manejar
     los nodos y punteros, reservar y liberar memoria, etc).
 
-## Crear ABB
+## Diseño
+Cómo ya sabemos, en nuestra implementación usaremos 2 estructuras: `abb_t` es la estructura principal de nuestro TDA y `nodo_t` que es ela estructura que almacenará nuestra información.
 
-## Insertar elemento
+```c
+typedef struct nodo {
+	void *elemento;
+	struct nodo *izq;
+	struct nodo *der;
+} nodo_t;
 
-## Quitar elemento
+typedef struct abb {
+	size_t nodos;
+	nodo_t *raiz;
+	int (*comparador)(void*, void*);
+}abb_t;
+```
 
-## Obtener elemento
+Tanto para las funciones de insertar, obtener y quitar, vamos a tener una función en común, que es la función de buscar un nodo. Al ser un Árbol Binario de Busqueda, vamos a tener que hacer comparaciones para llegar a un nodo, o llegar a ninguno (si es que tal elemento no se encuentra en el abb), ya esto, usé una función recursiva:
+```c
+nodo_t** buscar_nodo(abb_t* abb, nodo_t** nodo_actual, void* elemento)
+{
+    if (!*nodo_actual || abb->comparador(elemento, (*nodo_actual)->elemento) == 0) {
+        return nodo_actual;
+    } else if (abb->comparador(elemento, (*nodo_actual)->elemento) < 0) {
+        return buscar_nodo(abb, &(*nodo_actual)->izq, elemento);
+    } else {
+        return buscar_nodo(abb, &(*nodo_actual)->der, elemento);
+    }
+}
+```
 
 ## Recorridos:
 -Preorden
