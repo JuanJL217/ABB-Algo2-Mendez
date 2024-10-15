@@ -50,7 +50,7 @@ bool agregar_numero(const char *str, void *ctx)
 }
 
 bool leer_archivo_csv_y_agregar_poekmones(struct archivo_csv *archivo_pokemones,
-					  abb_t* abb_pokemones)
+					  abb_t *abb_pokemones)
 {
 	bool (*funciones[])(const char *,
 			    void *) = { agregar_nombre, agregar_tipo,
@@ -71,7 +71,7 @@ bool leer_archivo_csv_y_agregar_poekmones(struct archivo_csv *archivo_pokemones,
 		}
 		*nueva_ubicacion_pokemon = pokemon;
 		if (!abb_insertar(abb_pokemones,
-					    (void *)nueva_ubicacion_pokemon)) {
+				  (void *)nueva_ubicacion_pokemon)) {
 			fprintf(stderr,
 				"Pokemon %s no se puede agregar correctamente a la lista\n",
 				pokemon.nombre);
@@ -200,7 +200,7 @@ void mostrar_pokemon_encontrado(Pokemon *pokemon_encontrado)
 	printf("   Resistencia: %d\n", pokemon_encontrado->resistencia);
 }
 
-bool buscar_y_mostrar_datos_pokemon(abb_t* abb_pokemones)
+bool buscar_y_mostrar_datos_pokemon(abb_t *abb_pokemones)
 {
 	printf("\n");
 	Texto *nombre_pokemon_buscar = texto_crear();
@@ -216,7 +216,8 @@ bool buscar_y_mostrar_datos_pokemon(abb_t* abb_pokemones)
 	}
 
 	if (!texto_vacio(nombre_pokemon_buscar)) {
-		Pokemon *pokemon_encontrado = (Pokemon *)abb_obtener(abb_pokemones, (void*)nombre_pokemon_buscar);
+		Pokemon *pokemon_encontrado = (Pokemon *)abb_obtener(
+			abb_pokemones, (void *)nombre_pokemon_buscar);
 		if (pokemon_encontrado) {
 			mostrar_pokemon_encontrado(pokemon_encontrado);
 		} else {
@@ -229,28 +230,31 @@ bool buscar_y_mostrar_datos_pokemon(abb_t* abb_pokemones)
 	return true;
 }
 
-bool printf_pokemones(void* _pokemon, void* nada)
+bool printf_pokemones(void *_pokemon, void *nada)
 {
-	Pokemon* pokemon = (Pokemon*)_pokemon;
+	Pokemon *pokemon = (Pokemon *)_pokemon;
 	printf("%s", pokemon->nombre);
 	return true;
 }
 
-bool mostrar_pokemones(abb_t* abb_pokemones)
-{	
+bool mostrar_pokemones(abb_t *abb_pokemones)
+{
 	printf("\n");
 	size_t tamaño = abb_cantidad(abb_pokemones);
-	Pokemon** vector_pokemones = calloc(tamaño, sizeof(Pokemon*));
+	Pokemon **vector_pokemones = calloc(tamaño, sizeof(Pokemon *));
 	if (!vector_pokemones) {
 		return false;
 	}
-	size_t cantidad_iterados = abb_vectorizar_inorden(abb_pokemones, (void**)vector_pokemones, tamaño);
+	size_t cantidad_iterados = abb_vectorizar_inorden(
+		abb_pokemones, (void **)vector_pokemones, tamaño);
 	if (cantidad_iterados == 0) {
 		printf("No hay pokemones registrados");
 	} else {
-		for (size_t posicion = 0; posicion < cantidad_iterados; posicion++) {
-			printf("%li) %s\n", posicion+1, (*vector_pokemones[posicion]).nombre);
-		}	
+		for (size_t posicion = 0; posicion < cantidad_iterados;
+		     posicion++) {
+			printf("%li) %s\n", posicion + 1,
+			       (*vector_pokemones[posicion]).nombre);
+		}
 	}
 	free(vector_pokemones);
 	return true;
@@ -290,30 +294,31 @@ int main(int argc, char *argv[])
 		mostrar_menu();
 		Texto *texto = texto_crear();
 		if (!texto) {
-			abb_destruir_todo(abb_pokemones,
-					    destruir_pokemones);
+			abb_destruir_todo(abb_pokemones, destruir_pokemones);
 			fprintf(stderr,
 				"Error al asignar memoria para la estructura Texto\n");
 			return -5;
 		}
 
 		if (!texto_agregar_lectura_finalizada(texto)) {
-			abb_destruir_todo(abb_pokemones,
-					    destruir_pokemones);
+			abb_destruir_todo(abb_pokemones, destruir_pokemones);
 			texto_destruir(texto);
 			return -6;
 		}
 		if (!texto_vacio(texto)) {
 			if (strcmp(texto->texto_almacenado, "1") == 0) {
-				if (!buscar_y_mostrar_datos_pokemon(abb_pokemones)) {
-					abb_destruir_todo(abb_pokemones, destruir_pokemones);
+				if (!buscar_y_mostrar_datos_pokemon(
+					    abb_pokemones)) {
+					abb_destruir_todo(abb_pokemones,
+							  destruir_pokemones);
 					texto_destruir(texto);
 					return -7;
 				}
 
 			} else if (strcmp(texto->texto_almacenado, "2") == 0) {
 				if (!mostrar_pokemones(abb_pokemones)) {
-					abb_destruir_todo(abb_pokemones, destruir_pokemones);
+					abb_destruir_todo(abb_pokemones,
+							  destruir_pokemones);
 					return -10;
 				}
 
