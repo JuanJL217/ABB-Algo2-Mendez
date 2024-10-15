@@ -187,10 +187,7 @@ size_t abb_iterar_inorden(abb_t *abb, bool (*f)(void *, void *), void *ctx)
 	if (!abb || !f)
 		return 0;
 	size_t cantidad_iterados = 0;
-	return !recorrido_inorden(abb->raiz, f, ctx, &cantidad_iterados,
-				  abb->nodos) ?
-		       cantidad_iterados + 1 :
-		       abb->nodos;
+	return !recorrido_inorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos)?cantidad_iterados + 1 : abb->nodos;
 }
 
 size_t abb_vectorizar_inorden(abb_t *abb, void **vector, size_t tamaño)

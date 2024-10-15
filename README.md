@@ -60,7 +60,7 @@ vector_original = vector;
 
 ## Respuestas a las preguntas teóricas
 
-#   Explique teóricamente (y utilizando gráficos) qué es una árbol, árbol
+-   Explique teóricamente (y utilizando gráficos) qué es una árbol, árbol
     binario y árbol binario de búsqueda. Explique cómo funcionan, cuáles son sus
     operaciones básicas (incluyendo el análisis de complejidad de cada una de
     ellas) y por qué es importante la distinción de cada uno de estos diferentes
@@ -76,7 +76,7 @@ vector_original = vector;
 
 ## ¿Por qué es importante la distintición entre estos tipos de árboles?
 
-#   Explique la implementación de ABB realizada y las decisiones de diseño
+-   Explique la implementación de ABB realizada y las decisiones de diseño
     tomadas (por ejemplo, si tal o cuál funciones fue planteada de forma
     recursiva, iterativa o mixta y por qué, que dificultades encontró al manejar
     los nodos y punteros, reservar y liberar memoria, etc).
@@ -125,9 +125,36 @@ Con este movimiento, no tengo que estar dando más `if`, porque puede darse el c
 
 Cuando entra en la función de busqueda, y el elemento que busca, es el mismo que la raíz, retorna lo mismo que ingresé (la dirección de memoria de la raíz), entonces cuando entra en la función de `borrar_nodo_hoja`, significa que está haciendo un `raiz = NULL`, y así es como reduje verificaciones extras.
 
-
-
 ## Recorridos:
--Preorden
--Inorden
--Postorden
+-Preorden  
+-Inorden  
+-Postorden  
+
+Me centraré en un solo recorrido, ya que toda la lógica de funcionamiento se repite para los otros 2 recorridos (exceptuando las posiciones de qué nodo visita primero).  
+
+En este caso, me centraré en el recorrido postorden, es el recorrido que una vez que visite al hijo izquierdo y al hijo derecho, se puede recién visitar a sí mismo. El código es el siguiente:
+
+```c
+bool recorrido_postorden(nodo_t *nodo_actual, bool (*f)(void *, void *),
+			 void *ctx, size_t *contador, size_t tope)
+{
+	if (!nodo_actual)
+		return true;
+	if (!recorrido_postorden(nodo_actual->izq, f, ctx, contador, tope) ||
+	    !recorrido_postorden(nodo_actual->der, f, ctx, contador, tope))
+		return false;
+	if (*contador == tope || !f(nodo_actual->elemento, ctx))
+		return false;
+	(*contador)++;
+	return true;
+}
+```
+
+Si bien la función `abb_iterar_postorden` debe retornar un `size_t`, la función recurisiva hubiese podido ser una función que también retorne un `size_t`, pero decidí que mejor sea una función boleana. Lo que gano con esto, es verificar el estado actual de mi hijo, si su resultado fue un `true` o un `false`. Si alguno dio `false`, entonces es como decir: "Bueno, mi hijo me tiró false, entonces no puedo visitarme a mí mismo, salgo de la recursividad", entonces es un efecto en cadena de `return false`. Con esto gano que, al ser una función recursiva booleada, la función me tire un estado, dependiendo de ese estado, significa que en algún punto de la iteración dio `false`, entonces retorno el `contador+1`, pero si la función dio true, significa que iteró todo sin problemas, entonces, puedo decir con certeca que retorno la cantidad de elementos en el abb: `abb->nodos`.
+
+```c
+	size_t cantidad_iterados = 0;
+	return !recorrido_postorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos) ? cantidad_iterados+1 : abb->nodos;
+```
+
+Terminamos con el recorrido y verificaciones para la iteración, pero, podemos observar que hay un parametro más en nuestra función, que es: `size_t tope`. La razón de esto, es porque quiero utilizar esa misma función recursiva de iteración, para poder utilizarla en la función de `abb_vectorizar_postorden`. 
