@@ -157,4 +157,4 @@ Si bien la función `abb_iterar_postorden` debe retornar un `size_t`, la funció
 	return !recorrido_postorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos) ? cantidad_iterados+1 : abb->nodos;
 ```
 
-Terminamos con el recorrido y verificaciones para la iteración, pero, podemos observar que hay un parametro más en nuestra función, que es: `size_t tope`. La razón de esto, es porque quiero utilizar esa misma función recursiva de iteración, para poder utilizarla en la función de `abb_vectorizar_postorden`. 
+Terminamos con el recorrido y verificaciones para la iteración, pero, podemos observar que hay un parametro más en nuestra función, que es: `size_t tope`. La razón de esto es porque quiero reutilizar esta misma función recursiva de iteración en `abb_vectorizar_postorden`. Podemos ver que ambas funciones hacen algo similiar, que es recorrer el arbol de la misma manera, con la diferencia de que en `abb_iterar_postorden` debemos mandar una función que haga algo con cada elemento, pero en la función `abb_vectorizar_postorden`, debe poner cada elemento en cada posición del vector, entonces, ¿y si hago una función que haga eso?
