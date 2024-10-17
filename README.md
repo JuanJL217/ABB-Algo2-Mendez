@@ -175,20 +175,40 @@ Ahora bien, aquí viene otra razón de por qué también reutilizé la función 
 	}
 ```
 
-Lo que hace esta función, mejor dicho, la variable `puntero_a_vector` es tener la dirección del bloque en cada momento de la iteración, pudiendo así asignarle valores a cada bloque y poder moverme al siguiente bloque. Para entender todo eso, preferí explicar como se comportan los punteros desde cuando creo el vector, hasta donde doy valores.
+Lo que hace esta función, mejor dicho, la variable `puntero_a_vector` es tener la dirección del bloque en cada momento de la iteración, pudiendo así asignarle valores a cada bloque y poder moverme al siguiente bloque. Para entender todo eso, prefiero explicar como se comportan los punteros desde el momento que inicializo un vector, hasta cuando le asigno elementos (No hago distinción de stack y heap, solo me centraré en la manipulación de punteros)
 
-1) Inicializarmos el vector (para esto ya debemos tener el abb con sus respectivos elementos).
+1) Inicializamos el vector (para esto ya debemos tener el abb con sus respectivos elementos).
 
 <div align="center">
 <img width="70%" src="img/inicializar_vector.png">
 </div>
 
-2) Entender cómo funciona el parametro `void** vector` en `abb_vectorizar_postorden`.
+2) Entender cómo funciona el parametro `void** vector` en `abb_vectorizar_postorden`.  
+Cuando nosotros asignamos el vector como parametro de la función de vectorizacion: `(void **)&vector`, lo que sucede es que dentro de dicha función, vamos a tener un puntero que apunta a la dirección de memoria del vector.
 
 <div align="center">
 <img width="70%" src="img/parametro_vector_en_vectorizar.png">
 </div>
 
 3) El porqué mandamos `&vector` en la función recursivdad `recorrido_postorden`.
+Ya que entendemos cómo manejar punteros dobles, también podemos manejar punteros triples. En este caso, apuntaremos al puntero que apunta al vector, ¿por qué?, porque de esta manera, aparte de demostrar el manejo de punteros, podemos hacer más fácil la manipulación de los bloques.
 
-4) Como se maneja los punteros en la función `asignar_elementos_en_vector`.
+<div align="center">
+<img width="70%" src="img/vector_en_la_recursividad.png">
+</div>
+
+4) Cómo se maneja los punteros en la función `asignar_elementos_en_vector`.  
+En el código podemos observar que hacermos un casteo `void ***puntero_a_vector = (void ***)vector`, como vimos en la imagen del punto 3, vemos que cada parte corresponde un puntero void en particular, en nuestro caso, al un un puntero que apunta al puntero del vector, es un `void***`, de ahí el porqué el casteo. Con esto gano 'movilidad'.  
+El recorrido postorden de nuestro abb, seria: 5, 9, 8.
+
+<div align="center">
+<img width="70%" src="img/triple_puntero_vector1.png">
+</div>
+
+<div align="center">
+<img width="70%" src="img/triple_puntero_vector2.png">
+</div>
+
+<div align="center">
+<img width="70%" src="img/triple_puntero_vector3.png">
+</div>

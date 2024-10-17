@@ -159,9 +159,9 @@ size_t abb_cantidad(abb_t *abb)
 
 bool asignar_elementos_en_vector(void *elemento, void *vector)
 {
-	void ***puntero_a_vector = (void ***)vector;
-	**puntero_a_vector = elemento;
-	(*puntero_a_vector)++;
+	void ***puntero_puntero_a_vector = (void ***)vector;
+	**puntero_puntero_a_vector = elemento;
+	(*puntero_puntero_a_vector)++;
 	return true;
 }
 
