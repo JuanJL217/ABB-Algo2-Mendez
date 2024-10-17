@@ -69,12 +69,77 @@ vector_original = vector;
 ### Operaciones básicas: insertar, obtener y eliminar
 
 ## Árbol
+También conocido como Árbol N-ario, este árbol tiene la propiedad de que puede tener hsata `n` hijos. Puede ser 2, 3, 4, 5 ... No hay limites para la cantidad de hijos que puede tener cada padre, y no sabe qué cosa es menor o mayor.
+Mi criterio de ordenamiento será un recorrido por niveles.
+
+Insertar:
+
+<div align="center">
+<img width="70%" src="img/arbol_general_insertar.png">
+</div>
+
+Obtener:
+
+<div align="center">
+<img width="70%" src="img/arbol_general_obtener.png">
+</div>
+
+Eliminar:
+
+<div align="center">
+<img width="70%" src="img/arbol_general_eliminar.png">
+</div>
 
 ## Arbol Binario
+A diferencia del Árbol N-ario, este árbol tiene la distinción de que como máximo, cada padre puede tener 2 hijos, pero tampoco conoce qué es menor o mayor.
+Mi criterio de ordenamiento será un recorrido por niveles.
+
+Insertar:
+
+<div align="center">
+<img width="70%" src="img/arbol_binario_insertar.png">
+</div>
+
+Obtener:
+
+<div align="center">
+<img width="70%" src="img/arbol_binario_obtener.png">
+</div>
+
+Eliminar:
+
+<div align="center">
+<img width="70%" src="img/arbol_binario_eliminarpng">
+</div>
+
 
 ## Árbol Binario de Busqueda
+Árbol Binario de Busqueda, tendrá la distinción de qué cosa es menor, igual o mayor. Como convención, lo menor irá a la izquierda, y lo mayor a la derecha.
+Tendré 2 criterios de ordenamiento: Uno sin AVl y el otro con ALV.
+
+`Insertar sin AVL`: El peor de los casos es que se inserte de tal manera que parezca una lista, entonces será `O(n)`.
+`Insertar con ALV`: Al tener un manejo de como acomodar las ramas para que haya un orden con mejor optimización, al ser que vamos a movernos por rama, o sea, elegir una de dos opciones, eso es un O(log(n)).
+
+<div align="center">
+<img width="70%" src="img/arbol_binario_de_busqueda_insertar.png">
+</div>
+
+`Obtener sin AVL`: Al igual que insertar, el hecho de que puede quedar como una lista, y que busquemos el nodo del extremo, esta función se convierte en `O(n)`.
+`Obtener con AVL`: Buscará moviendose entre las ramas, por ende es `O(log(n))`.
+
+<div align="center">
+<img width="70%" src="img/arbol_binario_de_busqueda_obtener.png">
+</div>
+
+`Eliminar sin ALV`: Misma lógica, el peor caso es que borre el nodo del extremo, o también borrar un nodo con 2 hijos y que el nodo de su predecor inorden esté lejos, esto es `O(n)`.
+`Eliminar con ALV`; Suponiendo que queremos eliminar un nodo que tiene 2 hijos, no puede suceder que el predecesor inorden este lejos, ya que no sería ALV, por ende, esto es `O(log(n))`.
+
+<div align="center">
+<img width="70%" src="img/arbol_binario_de_busqueda_eliminar.png">
+</div>
 
 ## ¿Por qué es importante la distintición entre estos tipos de árboles?
+Es importante diferenciar estos 3 tipos de árboles por 2 razones: La primera sería para identificar 
 
 -   Explique la implementación de ABB realizada y las decisiones de diseño
     tomadas (por ejemplo, si tal o cuál funciones fue planteada de forma
@@ -212,3 +277,5 @@ El recorrido postorden de nuestro abb, seria: 5, 9, 8.
 <div align="center">
 <img width="70%" src="img/triple_puntero_vector3.png">
 </div>
+
+Podemos observar que aquí, cuando llegamos al al último bloque del vector, y avanzamos, vamos a un lugar peligroso, un lugar que está por guera del límite, pero, es peligroso si interactuamos con dicho lugar, ¿por qué menciono esto? Pues me refiero a las condiciones de corte en la función recursiva: `if (*contador == tope || !f(nodo_actual->elemento, ctx))` ... Al ser un `or`, significa que, si la primera condición es cierta, no va a verificar si es cierto o no lo de la derecha, lo que significa que si no es cierto la primera condición, entra en la función f. Debido a esa lóigca, cuando el contador llegue al tamaño del vector, nos aseguramos que jamás entrará a terreno prohibido.
