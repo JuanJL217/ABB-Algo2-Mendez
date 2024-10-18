@@ -69,10 +69,10 @@ vector_original = vector;
 ### Operaciones básicas: insertar, obtener y eliminar
 
 ## Árbol
-También conocido como Árbol N-ario, este árbol tiene la propiedad de que puede tener hsata `n` hijos. Puede ser 2, 3, 4, 5 ... No hay limites para la cantidad de hijos que puede tener cada padre, y no sabe qué cosa es menor o mayor.
+También conocido como Árbol N-ario, este árbol tiene la propiedad de que puede tener hsata `n` hijos. Puede ser 2, 3, 4, 5 ... No hay limites para la cantidad de hijos que puede tener cada padre (nosotros le damos la cantidad `n`), y no sabe qué cosa es menor o mayor.
 Mi criterio de ordenamiento será un recorrido por niveles.
 
-Insertar:
+Insertar: Al ser un recorrido por niveles, cuando queremos agregar un elemento, debemos recorrer los nodos hasta encontrar el primer NULL, esto lo convierten en `O(n)`
 
 <div align="center">
 <img width="70%" src="img/arbol_general_insertar.png">

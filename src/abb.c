@@ -1,6 +1,12 @@
 #include "abb.h"
 #include "abb_estructura_privada.h"
 
+typedef struct informacion {
+	void** vector;
+	size_t posicion;
+	size_t tamaño;
+} informacion_t;
+
 nodo_t *nodo_crear(void *elemento)
 {
 	nodo_t *nodo = calloc(1, sizeof(nodo_t));
@@ -158,26 +164,24 @@ size_t abb_cantidad(abb_t *abb)
 }
 
 bool asignar_elementos_en_vector(void *elemento, void *vector)
-{
-	void ***puntero_puntero_a_vector = (void ***)vector;
-	**puntero_puntero_a_vector = elemento;
-	(*puntero_puntero_a_vector)++;
+{	
+	((informacion_t*)vector)->vector[((informacion_t*)vector)->posicion] = elemento;
 	return true;
 }
 
 // INORDEN
 
 bool recorrido_inorden(nodo_t *nodo_actual, bool (*f)(void *, void *),
-		       void *ctx, size_t *contador, size_t tope)
+		       void *ctx, informacion_t* informacion)
 {
 	if (!nodo_actual)
 		return true;
-	if (!recorrido_inorden(nodo_actual->izq, f, ctx, contador, tope))
+	if (!recorrido_inorden(nodo_actual->izq, f, ctx, informacion))
 		return false;
-	if (tope == *contador || !f(nodo_actual->elemento, ctx))
+	if (informacion->posicion == informacion->tamaño || !f(nodo_actual->elemento, ctx))
 		return false;
-	(*contador)++;
-	if (!recorrido_inorden(nodo_actual->der, f, ctx, contador, tope))
+	informacion->posicion++;
+	if (!recorrido_inorden(nodo_actual->der, f, ctx, informacion))
 		return false;
 	return true;
 }
@@ -186,33 +190,32 @@ size_t abb_iterar_inorden(abb_t *abb, bool (*f)(void *, void *), void *ctx)
 {
 	if (!abb || !f)
 		return 0;
-	size_t cantidad_iterados = 0;
-	return !recorrido_inorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos)?cantidad_iterados + 1 : abb->nodos;
+	informacion_t informacion = {.vector = NULL, .posicion = 0, .tamaño = abb->nodos};
+	return !recorrido_inorden(abb->raiz, f, ctx, &informacion) ? informacion.posicion+1 : abb->nodos;
 }
 
 size_t abb_vectorizar_inorden(abb_t *abb, void **vector, size_t tamaño)
 {
 	if (!abb || !vector)
 		return 0;
-	size_t cantidad_iterados = 0;
+	informacion_t informarcion = {.vector = vector, .posicion = 0, .tamaño = tamaño};
 	return !recorrido_inorden(abb->raiz, asignar_elementos_en_vector,
-				  &vector, &cantidad_iterados, tamaño) ?
-		       cantidad_iterados :
-		       abb->nodos;
+				  &informarcion, &informarcion) ?
+		       informarcion.posicion : abb->nodos;
 }
 
 // PREORDEN
 
 bool recorrido_preorden(nodo_t *nodo_actual, bool (*f)(void *, void *),
-			void *ctx, size_t *contador, size_t tope)
+			void *ctx, informacion_t* informacion)
 {
 	if (!nodo_actual)
 		return true;
-	if (*contador == tope || !f(nodo_actual->elemento, ctx))
+	if (informacion->posicion == informacion->tamaño || !f(nodo_actual->elemento, ctx))
 		return false;
-	(*contador)++;
-	if (!recorrido_preorden(nodo_actual->izq, f, ctx, contador, tope) ||
-	    !recorrido_preorden(nodo_actual->der, f, ctx, contador, tope))
+	informacion->posicion++;
+	if (!recorrido_preorden(nodo_actual->izq, f, ctx, informacion) ||
+	    !recorrido_preorden(nodo_actual->der, f, ctx, informacion))
 		return false;
 	return true;
 }
@@ -221,10 +224,9 @@ size_t abb_iterar_preorden(abb_t *abb, bool (*f)(void *, void *), void *ctx)
 {
 	if (!abb)
 		return 0;
-	size_t cantidad_iterados = 0;
-	return !recorrido_preorden(abb->raiz, f, ctx, &cantidad_iterados,
-				   abb->nodos) ?
-		       cantidad_iterados + 1 :
+	informacion_t informacion = {.vector = NULL, .posicion = 0, .tamaño = abb->nodos};
+	return !recorrido_preorden(abb->raiz, f, ctx, &informacion) ?
+		       informacion.posicion+1 :
 		       abb->nodos;
 }
 
@@ -232,26 +234,25 @@ size_t abb_vectorizar_preorden(abb_t *abb, void **vector, size_t tamaño)
 {
 	if (!abb || !vector)
 		return 0;
-	size_t cantidad_iterados = 0;
-	return !recorrido_preorden(abb->raiz, asignar_elementos_en_vector,
-				   &vector, &cantidad_iterados, tamaño) ?
-		       cantidad_iterados :
+	informacion_t informarcion_posiciones = {.vector = vector, .posicion = 0, .tamaño = tamaño};
+	return !recorrido_preorden(abb->raiz, asignar_elementos_en_vector, &informarcion_posiciones, &informarcion_posiciones) ?
+		       informarcion_posiciones.posicion :
 		       abb->nodos;
 }
 
 // POSTORDEN
 
 bool recorrido_postorden(nodo_t *nodo_actual, bool (*f)(void *, void *),
-			 void *ctx, size_t *contador, size_t tope)
+			 void *ctx, informacion_t* informacion)
 {
 	if (!nodo_actual)
 		return true;
-	if (!recorrido_postorden(nodo_actual->izq, f, ctx, contador, tope) ||
-	    !recorrido_postorden(nodo_actual->der, f, ctx, contador, tope))
+	if (!recorrido_postorden(nodo_actual->izq, f, ctx, informacion) ||
+	    !recorrido_postorden(nodo_actual->der, f, ctx, informacion))
 		return false;
-	if (*contador == tope || !f(nodo_actual->elemento, ctx))
+	if (informacion->posicion == informacion->tamaño || !f(nodo_actual->elemento, ctx))
 		return false;
-	(*contador)++;
+	informacion->posicion++;
 	return true;
 }
 
@@ -259,10 +260,9 @@ size_t abb_iterar_postorden(abb_t *abb, bool (*f)(void *, void *), void *ctx)
 {
 	if (!abb)
 		return 0;
-	size_t cantidad_iterados = 0;
-	return !recorrido_postorden(abb->raiz, f, ctx, &cantidad_iterados,
-				    abb->nodos) ?
-		       cantidad_iterados + 1 :
+	informacion_t informacion = {.vector = NULL, .posicion = 0, .tamaño = abb->nodos};
+	return !recorrido_postorden(abb->raiz, f, ctx, &informacion) ?
+		       informacion.posicion + 1 :
 		       abb->nodos;
 }
 
@@ -270,9 +270,9 @@ size_t abb_vectorizar_postorden(abb_t *abb, void **vector, size_t tamaño)
 {
 	if (!abb || !vector)
 		return 0;
-	size_t cantidad_iterados = 0;
+	informacion_t informarcion_posiciones = {.vector = vector, .posicion = 0, .tamaño = tamaño};
 	return !recorrido_postorden(abb->raiz, asignar_elementos_en_vector,
-				    &vector, &cantidad_iterados, tamaño) ?
-		       cantidad_iterados :
+				    &informarcion_posiciones, &informarcion_posiciones) ?
+		       informarcion_posiciones.posicion :
 		       abb->nodos;
 }
