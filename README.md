@@ -31,7 +31,7 @@ Se creó un programa que lee un archivo `.csv` y guarda todos los elementos en u
 Así quedaría el Stack y Heap usando un ABB para ordenar Pokemones, usando `pokedex.csv`.
 
 <div align="center">
-<img width="70%" src="img/abb_pokemones.svg">
+<img width="70%" src="img/abb_pokemones.png">
 </div>
 
 ---
