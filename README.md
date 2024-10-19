@@ -109,30 +109,30 @@ Obtener:
 Eliminar:
 
 <div align="center">
-<img width="70%" src="img/arbol_binario_eliminarpng">
+<img width="70%" src="img/arbol_binario_eliminar.png">
 </div>
 
 
 ## Árbol Binario de Busqueda
 Árbol Binario de Busqueda, tendrá la distinción de qué cosa es menor, igual o mayor. Como convención, lo menor irá a la izquierda, y lo mayor a la derecha.
-Tendré 2 criterios de ordenamiento: Uno sin AVl y el otro con ALV.
+Tendré 2 criterios de ordenamiento: Balanceado y no Balanceado.
 
-`Insertar sin AVL`: El peor de los casos es que se inserte de tal manera que parezca una lista, entonces será `O(n)`.
-`Insertar con ALV`: Al tener un manejo de como acomodar las ramas para que haya un orden con mejor optimización, al ser que vamos a movernos por rama, o sea, elegir una de dos opciones, eso es un O(log(n)).
+`Insertar en abb no Balanceado`: Al tener un manejo de como acomodar las ramas para que haya un orden con mejor optimización, al ser que vamos a movernos por rama, o sea, elegir una de dos opciones, eso es un O(log(n)).
+`Insertar en abb Balanceado`: El peor de los casos es que se inserte de tal manera que parezca una lista, entonces será `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_de_busqueda_insertar.png">
 </div>
 
-`Obtener sin AVL`: Al igual que insertar, el hecho de que puede quedar como una lista, y que busquemos el nodo del extremo, esta función se convierte en `O(n)`.
-`Obtener con AVL`: Buscará moviendose entre las ramas, por ende es `O(log(n))`.
+`Insertar en abb Balanceado: Buscará moviendose entre las ramas, por ende es `O(log(n))`.
+`Insertar en abb no Balanceado`: Al igual que insertar, el hecho de que puede quedar como una lista, y que busquemos el nodo del extremo, esta función se convierte en `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_de_busqueda_obtener.png">
 </div>
 
-`Eliminar sin ALV`: Misma lógica, el peor caso es que borre el nodo del extremo, o también borrar un nodo con 2 hijos y que el nodo de su predecor inorden esté lejos, esto es `O(n)`.
-`Eliminar con ALV`; Suponiendo que queremos eliminar un nodo que tiene 2 hijos, no puede suceder que el predecesor inorden este lejos, ya que no sería ALV, por ende, esto es `O(log(n))`.
+`Eliminar en abb Balanceado`; Suponiendo que queremos eliminar un nodo que tiene 2 hijos, no puede suceder que el predecesor inorden este lejos, ya que no sería ALV, por ende, esto es `O(log(n))`.
+`Eliminar en abb no Balanceado`: Misma lógica, el peor caso es que borre el nodo del extremo, o también borrar un nodo con 2 hijos y que el nodo de su predecor inorden esté lejos, esto es `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_de_busqueda_eliminar.png">
@@ -176,19 +176,17 @@ Tanto para las funciones de insertar, obtener y quitar, vamos a tener una funci�
 		}
 	}
 ```
-Cómo se puede ver, la función retorna un `nodo_t**`, pero, ¿por qué doble puntero y no uno solo? Bueno, la respuesta es para optimizar código. La explicación es la siguiente: Si nosotros hacemos una función que retorne un `nodo_t*`, significa que estamos retornando un puntero a nodo, o sea, la dirección de memoria del nodo, cosa que está bien, si buscamos un nodo que contenga un elemento `x`, entonces una función que retorna `nodo_t*` hace ese trabajo, pero qué pasa con esto, para la función `obtener` viene de maravilla, porque si se encuentra, retorna el nodo, si no, retorna `NULL` En la función de `insertar`, sucede algo casi parecido pero con modificaciones, pero la idea principal para usar esté codigo es cuando queremos `quitar` un elemento, porque aparte de encontrar el nodo, debemos buscar el padre de ese nodo, y como nuestro abb solo tiene una dirección, no podemos saber quién es su padre, y tendriamos que volver a iterar hasta un nodo antes, entonces, primero intenté solucionar el mayor problema y con esa solución, solucionar las otras más pequeñas y es por eso que usé una función que retorne `nodo_t**`, porque gracias a esto, no necesito buscar el nodo padre, ya que yo estoy dentro del nodo padre, y tengo la dirección de memoria del puntero que apunta al hijo, por ende, tengo la dirección de memoria de mi hijo estando dentro del padre sin apuntar al padre.
+Cómo se puede ver, la función retorna un `nodo_t**`, pero, ¿por qué doble puntero y no uno solo (nodo_t*)? Bueno, la respuesta es para optimizar código. La explicación es la siguiente: Si nosotros hacemos una función que retorne un `nodo_t*`, significa que estamos retornando un puntero a nodo, o sea, la dirección de memoria del nodo, cosa que está bien, si buscamos un nodo que contenga un elemento `x`, entonces una función que retorna `nodo_t*` hace ese trabajo, pero qué pasa con esto, para la función `obtener` viene de maravilla, porque si se encuentra, retorna el nodo, si no, retorna `NULL`. En la función de `insertar`, sucede algo similar pero con modificaciones, ya que si hay repetidos o no, pero la idea principal para usar esté codigo es cuando queremos `quitar` un elemento, porque aparte de encontrar el nodo, debemos buscar el padre de ese nodo, y como nuestro abb solo tiene una dirección, no podemos saber quién es su padre, y tendriamos que volver a iterar hasta un nodo antes, entonces, primero intenté solucionar el mayor problema y con esa solución, solucionar las otras más pequeñas y es por eso que usé una función que retorne `nodo_t**`, porque gracias a esto, no necesito buscar el nodo padre, ya que yo estoy dentro del nodo padre, y tengo la dirección de memoria del puntero que apunta al hijo, por ende, tengo la dirección de memoria de mi hijo estando dentro del padre sin apuntar al padre.
 
 <div align="center">
 <img width="70%" src="img/puntero_nodo.png">
 </div>
 
-Con este movimiento, no tengo que estar dando más `if`, porque puede darse el caso de que elimine un nodo raiz, entonces se debe hacer verificaciones extras, pero con mi implementación, ya maneja esos casos internamente. Un ejemplo: Si quiero eliminar el único nodo que tiene un abb, sería la raiz, entonces, si elimino usando una función que retorna `nodo_t*`, cuando verifique que el nodo es una hoja, aparte de eso, debe verificar si es una raiz o no, en cambio, como yo uso retorno un `nodo_t**`, observar que yo le paso la direccióñ de memoria de la raiz.  
+Con este movimiento, no tengo que estar dando más `if`, porque puede darse el caso de que elimine un nodo raiz, entonces se debe hacer verificaciones extras, pero con mi implementación, ya maneja esos casos internamente. Un ejemplo: Si quiero eliminar el único nodo que tiene un abb, sería la raiz, entonces, si elimino usando una función que retorna `nodo_t*`, cuando verifique que el nodo es una hoja, aparte de eso, debe verificar si es una raiz o no, en cambio, con mi implementación no hay esa verificación `nodo_t**`, por que al pasarle la dirección de memoria de `abb->raiz`, estoy apuntando al enlace que se crea entre la estructura `abb_t` y el nodo raiz del abb.
 
-```c
-    nodo_t **puntero_entre_padre_e_hijo = buscar_nodo(abb, &(abb->raiz), buscado);
-```
-
-Cuando entra en la función de busqueda, y el elemento que busca, es el mismo que la raíz, retorna lo mismo que ingresé (la dirección de memoria de la raíz), entonces cuando entra en la función de `borrar_nodo_hoja`, significa que está haciendo un `raiz = NULL`, y así es como reduje verificaciones extras.
+<div align="center">
+<img width="70%" src="img/puntero_raiz.png">
+</div>
 
 ## Recorridos:
 -Preorden  
@@ -197,85 +195,82 @@ Cuando entra en la función de busqueda, y el elemento que busca, es el mismo qu
 
 Me centraré en un solo recorrido, ya que toda la lógica de funcionamiento se repite para los otros 2 recorridos (exceptuando las posiciones de qué nodo visita primero).  
 
-En este caso, me centraré en el recorrido postorden, es el recorrido que una vez que visite al hijo izquierdo y al hijo derecho, se puede recién visitar a sí mismo. El código es el siguiente:
+En este caso, me centraré en el recorrido postorden, es el recorrido que una vez que visite al hijo izquierdo y al hijo derecho, se puede visitar a sí mismo.
+
+También explicar que creeé una estructura llamada `información_t`, que tendrá 3 parametros: una variale `tope`, almacena la cantidad de nodos que debemos visitar (como máximo), una variable `iteracion`, que vendría a ser la posición en la que el elemento visitado está actualmente con respecto a su recorrido, y un doble puntero a vector, que de eso hablarémos luego.
+
+```c
+	typedef struct informacion {
+		void** vector;
+		size_t iteracion;
+		size_t tope;
+	} informacion_t;
+```
+
+Si bien la función `abb_iterar_postorden` debe retornar un `size_t`, la función recurisiva hubiese podido ser una función que también retorne un `size_t`, pero decidí que mejor sea una función boleana. Lo que gano con esto, es verificar el estado actual de mi hijo, si su resultado fue un `true` o un `false`. Si alguno dio `false`, entonces es como decir: `"Bueno, mi hijo me tiró false, entonces no puedo visitarme a mí mismo, también retorno false"`, entonces es un efecto en cadena de `return false`. 
 
 ```c
 	bool recorrido_postorden(nodo_t *nodo_actual, bool (*f)(void *, void *),
-				void *ctx, size_t *contador, size_t tope)
+				void *ctx, informacion_t* informacion)
 	{
 		if (!nodo_actual)
 			return true;
-		if (!recorrido_postorden(nodo_actual->izq, f, ctx, contador, tope) ||
-			!recorrido_postorden(nodo_actual->der, f, ctx, contador, tope))
+		if (!recorrido_postorden(nodo_actual->izq, f, ctx, informacion) ||
+			!recorrido_postorden(nodo_actual->der, f, ctx, informacion))
 			return false;
-		if (*contador == tope || !f(nodo_actual->elemento, ctx))
+		if (informacion->iteracion == informacion->tope || !f(nodo_actual->elemento, ctx))
 			return false;
-		(*contador)++;
+		informacion->iteracion++;
 		return true;
 	}
 ```
 
-Si bien la función `abb_iterar_postorden` debe retornar un `size_t`, la función recurisiva hubiese podido ser una función que también retorne un `size_t`, pero decidí que mejor sea una función boleana. Lo que gano con esto, es verificar el estado actual de mi hijo, si su resultado fue un `true` o un `false`. Si alguno dio `false`, entonces es como decir: "Bueno, mi hijo me tiró false, entonces no puedo visitarme a mí mismo, también retorno false", entonces es un efecto en cadena de `return false`. Con esto gano que, al ser una función recursiva booleada, la función me tire un estado, dependiendo de ese estado, significa que en algún punto de la iteración dio `false`, entonces retorno el `contador+1`, pero si la función dio true, significa que iteró todo sin problemas, entonces, puedo decir con certeca que retorno la cantidad de elementos en el abb: `abb->nodos`.
+Con esto gano que, al ser una función recursiva booleada, la función me tire un estado, dependiendo de ese estado, significa que en algún punto de la iteración dio `false`, entonces retorno el en qué iteración cortó pero si la función dio true, significa que iteró todo sin problemas, entonces, puedo decir con certeca que retorno la cantidad de elementos en el abb: `abb->nodos`. Ya que `informacion` es una función que solo se usará cuando entre a dicha función, directamente hago que sea una variable que vive en el stack y no necesitaría pedirle memoria al heap.
 
 ```c
-	size_t cantidad_iterados = 0;
-	return !recorrido_postorden(abb->raiz, f, ctx, &cantidad_iterados, abb->nodos) ? cantidad_iterados+1 : abb->nodos;
+	size_t abb_iterar_postorden(abb_t *abb, bool (*f)(void *, void *), void *ctx)
+	{
+		if (!abb)
+			return 0;
+		informacion_t informacion = {.vector = NULL, .iteracion = 0, .tope = abb->nodos};
+		return !recorrido_postorden(abb->raiz, f, ctx, &informacion) ? informacion.iteracion + 1 : abb->nodos;
+	}
 ```
 
-Terminamos con el recorrido y verificaciones para la función iterativa, pero, podemos observar que hay un parametro más en nuestra función, que es: `size_t tope`. La razón de esto es porque quiero reutilizar esta misma función recursiva de iteración en `abb_vectorizar_postorden` (misma lógica para los otros recorridos). Podemos ver que ambas funciones hacen algo similiar, que es recorrer el arbol, con la diferencia de que en `abb_iterar_postorden` debemos mandar una función que haga algo con cada elemento, pero en la función `abb_vectorizar_postorden`, debe poner cada elemento en cada posición del vector, hasta alcanzar todo el tamaño que nos dan, entonces de ahí viene el porqué de ese parametro, con eso ganamos que cuando llegue a esa posicion (el contador), salga de la función.
+Hablando un poco más sobre mi estructura `informacion_t`, nos ayudará a poder aumentar en 1 cada vez que visitamos un elemento, y aunque halla una condición de corte a la izquierda, pero dicho corte, en nuestra iteración, no tiene efecto, pero para la siguiente función del abb, sí.
+
 ```c
-	if (*contador == tope || !f(nodo_actual->elemento, ctx))
+	if (informacion->iteracion == informacion->tope || !f(nodo_actual->elemento, ctx))
 		return false;
+	informacion->iteracion++;
 ```
 
-Ahora bien, aquí viene otra razón de por qué también reutilizé la función recursiva, y es que, en vez de crear otra función auxiliar que ponga cada elemento en dicho vector, mejor reutilizar el parametro `bool (*f)(void *, void *), void *ctx`: Lo que hago es, darle la dirección de memoria del vector en `ctx`, y una función que haga algo con ese vector em `f`.
+La siguiente función para hablar, es la función `abb_vectorizar_postorden`. Primero había pensando en que sea un triple puntero al vector y que cada vez que iteramos el arbol, vaya avanzando al siguiente bloque de memoria para almacenar los elementos, pero hay problema, cuando hacemos esto, cuando llegamos al final, tiene que avanzar, y no hay manera de hacer eso sin complejizar tanto el código, por eso decidí directamente crear la estructura `informacion_t`, que almacena el vector que le pasamos.
+
+```c
+	informacion_t informarcion_posiciones = {.vector = vector, .iteracion = 0, .tope = tamaño};
+	return !recorrido_postorden(abb->raiz, asignar_elementos_en_vector, 
+					&informarcion_posiciones, &informarcion_posiciones) ? informarcion_posiciones.iteracion : abb->nodos;
+```
+
+Como podemos observar, le asignamos el puntero al vector en nuestra estructura, y un tope, que será el tamaño del vector.
+Para esto, también mencionar que se puede apreciar que asignamos 2 veces `&informarcion_posiciones` a la función recursiva, y esto es para que, la estructura `informacion_t` pueda tomarse en cada momento de la iteración con el elemento, si tenemos el vector y tenemos la posición, solo debemos asignarle el elemento, y creando la función `asignar_elementos_en_vector`, emos achicado el problema de la iteración y la vectorización.
 
 ```c
 	bool asignar_elementos_en_vector(void *elemento, void *vector)
-	{
-		void ***puntero_a_vector = (void ***)vector;
-		**puntero_a_vector = elemento;
-		(*puntero_a_vector)++;
+	{	
+		((informacion_t*)vector)->vector[((informacion_t*)vector)->iteracion] = elemento;
 		return true;
 	}
 ```
 
-Lo que hace esta función, mejor dicho, la variable `puntero_a_vector` es tener la dirección del bloque en cada momento de la iteración, pudiendo así asignarle valores a cada bloque y poder moverme al siguiente bloque. Para entender todo eso, prefiero explicar como se comportan los punteros desde el momento que inicializo un vector, hasta cuando le asigno elementos (No hago distinción de stack y heap, solo me centraré en la manipulación de punteros)
+Con esto, en la dicho vector, en tal posición, se almacenará el elemento en el que el recorrido se encuentre en ese momento.
+Volviendo al código del corte, hay 2 cortes:
 
-1) Inicializamos el vector (para esto ya debemos tener el abb con sus respectivos elementos).
+```c
+	if (informacion->iteracion == informacion->tope || !f(nodo_actual->elemento, ctx))
+		return false;
+	informacion->iteracion++;
+```
 
-<div align="center">
-<img width="70%" src="img/inicializar_vector.png">
-</div>
-
-2) Entender cómo funciona el parametro `void** vector` en `abb_vectorizar_postorden`.  
-Cuando nosotros asignamos el vector como parametro de la función de vectorizacion: `(void **)&vector`, lo que sucede es que dentro de dicha función, vamos a tener un puntero que apunta a la dirección de memoria del vector.
-
-<div align="center">
-<img width="70%" src="img/parametro_vector_en_vectorizar.png">
-</div>
-
-3) El porqué mandamos `&vector` en la función recursivdad `recorrido_postorden`.
-Ya que entendemos cómo manejar punteros dobles, también podemos manejar punteros triples. En este caso, apuntaremos al puntero que apunta al vector, ¿por qué?, porque de esta manera, aparte de demostrar el manejo de punteros, podemos hacer más fácil la manipulación de los bloques.
-
-<div align="center">
-<img width="70%" src="img/vector_en_la_recursividad.png">
-</div>
-
-4) Cómo se maneja los punteros en la función `asignar_elementos_en_vector`.  
-En el código podemos observar que hacermos un casteo `void ***puntero_a_vector = (void ***)vector`, como vimos en la imagen del punto 3, vemos que cada parte corresponde un puntero void en particular, en nuestro caso, al un un puntero que apunta al puntero del vector, es un `void***`, de ahí el porqué el casteo. Con esto gano 'movilidad'.  
-El recorrido postorden de nuestro abb, seria: 5, 9, 8.
-
-<div align="center">
-<img width="70%" src="img/triple_puntero_vector1.png">
-</div>
-
-<div align="center">
-<img width="70%" src="img/triple_puntero_vector2.png">
-</div>
-
-<div align="center">
-<img width="70%" src="img/triple_puntero_vector3.png">
-</div>
-
-Podemos observar que aquí, cuando llegamos al al último bloque del vector, y avanzamos, vamos a un lugar peligroso, un lugar que está por guera del límite, pero, es peligroso si interactuamos con dicho lugar, ¿por qué menciono esto? Pues me refiero a las condiciones de corte en la función recursiva: `if (*contador == tope || !f(nodo_actual->elemento, ctx))` ... Al ser un `or`, significa que, si la primera condición es cierta, no va a verificar si es cierto o no lo de la derecha, lo que significa que si no es cierto la primera condición, entra en la función f. Debido a esa lóigca, cuando el contador llegue al tamaño del vector, nos aseguramos que jamás entrará a terreno prohibido.
+¿Qué pasa aquí? Una vez que hallamos llegado al tope del vector, si es verdadero el lado izquierda, ya no entrará a la parte izquierda, ya que al ser un `or`, con verificar que la primera condición sea verdadera, es suficiente, ya que `or` tiene la propiedad de si alguna de las 2 es cierto, le es suficiente para que todo sea verdad, por eso cuando vamos iteración nodo por nodo, la condicón de la izquierda no se cumple, por eso entra a la condición de la derecha, como ambas no cumplen, no entra en la parte de `return false`, por ende, sigue iterando y aumentando la posición.
