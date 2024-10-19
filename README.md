@@ -47,44 +47,44 @@ Así quedaría el Stack y Heap usando un ABB para ordenar Pokemones, usando `pok
 ### Operaciones básicas: insertar, obtener y eliminar
 
 ## Árbol
-También conocido como Árbol N-ario, este árbol tiene la propiedad de que puede tener hsata `n` hijos. Puede ser 2, 3, 4, 5 ... No hay limites para la cantidad de hijos que puede tener cada padre (nosotros le damos la cantidad `n`), y no sabe qué cosa es menor o mayor.
-Mi criterio de ordenamiento será un recorrido por niveles.
+También conocido como Árbol N-ario, este árbol tiene la propiedad de que puede tener `n` hijos. Puede ser 2, 3, 4, 5 ... No hay limites para la cantidad de hijos que puede tener cada padre, y no sabe qué cosa es menor o mayor.
+Mi criterio de ordenamiento será un recorrido por conocimiento, o sea, saber donde se debe posicionar\buscar\eliminar. Lo que conlleva a hacerlo dináimo.
 
-Insertar: Al ser un recorrido por niveles, cuando queremos agregar un elemento, debemos recorrer los nodos hasta encontrar el primer NULL, esto lo convierten en `O(n)`
+Insertar: En el peor de los casos, tendrémos que insertar el elemento más abajo y a la derecha, lo que significa recorrer todo el árbol, esto es `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_general_insertar.png">
 </div>
 
-Obtener:
+Obtener: Se buscará todos los nodos hijos de cada padre, siguiendo el orden establecido por el usuario donde desea buscar algún elemento, donde puede existir o no el elemento. Esto es `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_general_obtener.png">
 </div>
 
-Eliminar:
+Eliminar: Con la misma lógica, marcaremos el recorrido, pasando por todos los nodos anteriores a este, hasta llegar al elemento que deseamos eliminar `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_general_eliminar.png">
 </div>
 
 ## Arbol Binario
-A diferencia del Árbol N-ario, este árbol tiene la distinción de que como máximo, cada padre puede tener 2 hijos, pero tampoco conoce qué es menor o mayor.
+A diferencia del Árbol N-ario, este árbol tiene la distinción de que como máximo, cada padre puede tener cómo máximo 2 hijos, pero tampoco conoce qué es menor o mayor.  
 Mi criterio de ordenamiento será un recorrido por niveles.
 
-Insertar:
+Insertar: Insertamos en el primer hijo que se encuentre vacío, esto es `O(n)`, ya que debemos recorrer todo el á®bol para encontrarlo.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_insertar.png">
 </div>
 
-Obtener:
+Obtener: La misma idea, al ser un recorrido por niveles, debemos recorrer hasta encontrarlo `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_obtener.png">
 </div>
 
-Eliminar:
+Eliminar: Debemos recorrer nodo por nodo hasta toparnos con el elemento, `O(n)`.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_eliminar.png">
@@ -93,7 +93,7 @@ Eliminar:
 
 ## Árbol Binario de Busqueda
 Árbol Binario de Busqueda, tendrá la distinción de qué cosa es menor, igual o mayor. Como convención, lo menor irá a la izquierda, y lo mayor a la derecha.
-Tendré 2 criterios de ordenamiento: Balanceado y no Balanceado.
+Tendré 2 criterios de ordenamiento: no Balanceado y Balanceado.
 
 `Insertar en abb no Balanceado`: El peor de los casos es que se inserte de tal manera que parezca una lista, entonces será `O(n)`.
 `Insertar en abb Balanceado`: Al tener un manejo de como acomodar las ramas para que haya un orden con mejor optimización, al ser que vamos a movernos por rama, o sea, siempre elegir una de dos opciones hasta llegar a nuestro elemento (en el no balanceado, no podríamos elegir entre 2 caminos, ya que si parece una lista, hay solo un recorrido, 1 sola opción), eso es un O(log(n)).
@@ -117,7 +117,7 @@ Tendré 2 criterios de ordenamiento: Balanceado y no Balanceado.
 </div>
 
 ## ¿Por qué es importante la distintición entre estos tipos de árboles?
-Es importante diferenciar estos 3 tipos de árboles por 2 razones: La primera sería para identificar 
+Cada tipo de Árbol ataca un problema en específico. Como sabemos, un Árbol Binario de Busqueda, al tener un funcionamiento comparativo, sirve para ordenar elementos con eficiencia. Un Árbol Binario no existe la comparación de qué es mayor o menor, en nuestra explicación que dimos más arriba, decidimos que sea un recorrido por niveles, pero no necesariamente es la única, por ejemplo un Árbol Binario serviría para operaciones matemáticas, ya que si tienes 4 + 5 + 2, es lo mismo que primero hacer 4 + 5 (subarbol) y luego ese resultado sumarle 2, y así recorrimos el árbol. Por último, el Árbol General o N-ario, en la manera que mostré, es como si fuese un directorio donde se guardaman archivos. Entonces, cada Árbol tiene un porpósito diferente y depende de eso, qué nos conviene mejor usar.
 
 -   Explique la implementación de ABB realizada y las decisiones de diseño
     tomadas (por ejemplo, si tal o cuál funciones fue planteada de forma
@@ -159,6 +159,24 @@ Cómo se puede ver, la función retorna un `nodo_t**`, pero, ¿por qué doble pu
 <div align="center">
 <img width="70%" src="img/puntero_nodo.png">
 </div>
+
+Mencionar que, al liberar el nodo, liberamos el nodo donde se encuentra el elemento a eliminar, y con eso, solo necesito un `free()` en la función de `quitar_abb`. Existe otra manera, que sería encotrar un padre con 2 hijos, e intercambia elementos (no los nodos) con el predecesor inorden, lo cuál es bueno, ya que en ese caso, se covierte en eliminar solo el nodo precesor que sería un nodo con 1 hijo o una hoja, pero decidí mejor hacer 3 funciones por separado, para demostrar el dominio de los punteros y sabiendo qué estoy haciendo.
+
+```c
+	nodo_t **puntero_entre_padre_e_hijo = buscar_nodo(abb, &(abb->raiz), buscado);
+	if (!*puntero_entre_padre_e_hijo)
+		return false;
+	nodo_t *nodo_guardado = (*puntero_entre_padre_e_hijo);
+	if (!(*puntero_entre_padre_e_hijo)->izq && !(*puntero_entre_padre_e_hijo)->der)
+		borrar_nodo_hoja(abb, puntero_entre_padre_e_hijo);
+	else if ((*puntero_entre_padre_e_hijo)->izq && (*puntero_entre_padre_e_hijo)->der)
+		borrar_nodo_con_hijos(abb, puntero_entre_padre_e_hijo);
+	else
+		borrar_nodo_con_un_hijo(abb, puntero_entre_padre_e_hijo);
+	if (encontrado)
+		*encontrado = nodo_guardado->elemento;
+	free(nodo_guardado);
+```
 
 Con este movimiento, no tengo que estar dando más `if`, porque puede darse el caso de que elimine un nodo raiz, entonces se debe hacer verificaciones extras, pero con mi implementación, ya maneja esos casos internamente. Un ejemplo: Si quiero eliminar el único nodo que tiene un abb, sería la raiz, entonces, si elimino usando una función que retorna `nodo_t*`, cuando verifique que el nodo es una hoja, aparte de eso, debe verificar si es una raiz o no, en cambio, con mi implementación no hay esa verificación `nodo_t**`, por que al pasarle la dirección de memoria de `abb->raiz`, estoy apuntando al enlace que se crea entre la estructura `abb_t` y el nodo raiz del abb.
 
@@ -252,3 +270,16 @@ Volviendo al código del corte, hay 2 cortes:
 ```
 
 ¿Qué pasa aquí? Una vez que hallamos llegado al tope del vector, si es verdadero el lado izquierda, ya no entrará a la parte izquierda, ya que al ser un `or`, con verificar que la primera condición sea verdadera, es suficiente, ya que `or` tiene la propiedad de si alguna de las 2 es cierto, le es suficiente para que todo sea verdad, por eso cuando vamos iteración nodo por nodo, la condicón de la izquierda no se cumple, por eso entra a la condición de la derecha, como ambas no cumplen, no entra en la parte de `return false`, por ende, sigue iterando y aumentando la posición.
+
+Complejidades Algorirmicas de cada función:
+Con todo lo mencionado, para nuestra implementación de ABB, podemos dar las complejidades algoritmicas de cada función.
+
+`abb_crear`: `O(1)`
+`abb_insertar`: `O(n)`
+`abb_quitar`: `O(n)`
+`abb_obtener`: `O(n)`
+`abb_cantidad`: `O(1)`
+`abb_destruir`: `O(n)`, ya que liberará cada nodo que tenga el ABB.
+`abb_destruir_todo`: `O(n * f(g))`, siendo `f(g)` el elemento que tenga el nodo a eliminar, quizás es un ABB de Listas, entonces debemos liberar cada lista, que guardan `m` elementos.
+`Funciones de iteración`: `O(n * f(g))`, siendo `f(g)` dependiendo qué tipo de esructura es el elemento guardado, quizás una lista y la función es sumar todos lo elementos de cada lista según la iteración.
+`Funciones de Vectorización`: `O(n + m)`, debemos tener en cuenta que, aunque tengamos un tamaño `m` del vector, el máximo de elementos que vamos a poner, será la cantidad de elementos en el abb, osea, si tenemos un vector de 100 bloques, pero nuestro ABB tiene solo 5 elementos, solo se iterará y vectorizará esos 5 elementos, por ende, la funciones de vectorizar quedan en `O(n)`.
