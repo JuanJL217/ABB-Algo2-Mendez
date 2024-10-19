@@ -160,6 +160,25 @@ Cómo se puede ver, la función retorna un `nodo_t**`, pero, ¿por qué doble pu
 <img width="70%" src="img/puntero_nodo.png">
 </div>
 
+Para entender un poco mejor esto, tengo otra función que retorna `nodo_t**`, y es buscar el predecesor inorden, porque cuando elimino un nodo con 2 hijos, debo buscar su reemplazo. A esta función le pasamos como parametro el hijo izquierdo del nodo a eliminar, y buscará recursivamente el nodo que está más a la derecha (el reemplazo).
+
+```c
+nodo_t **buscar_predecesor_inorden(nodo_t **nodo_actual)
+{
+	if (!(*nodo_actual) || !(*nodo_actual)->der) {
+		return nodo_actual;
+	}
+	return buscar_predecesor_inorden(&((*nodo_actual)->der));
+}
+```
+<div align="center">
+<img width="70%" src="img/puntero_reemplazante.png">
+</div>
+
+<div align="center">
+<img width="70%" src="img/nodo_eliminar.png">
+</div>
+
 Mencionar que, al liberar el nodo, liberamos el nodo donde se encuentra el elemento a eliminar, y con eso, solo necesito un `free()` en la función de `quitar_abb`. Existe otra manera, que sería encotrar un padre con 2 hijos, e intercambia elementos (no los nodos) con el predecesor inorden, lo cuál es bueno, ya que en ese caso, se covierte en eliminar solo el nodo precesor que sería un nodo con 1 hijo o una hoja, pero decidí mejor hacer 3 funciones por separado, para demostrar el dominio de los punteros y sabiendo qué estoy haciendo.
 
 ```c

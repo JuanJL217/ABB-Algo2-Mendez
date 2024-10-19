@@ -22,6 +22,25 @@ bool corte_elementos(void *elemento, void *corte)
 	return (*(int *)elemento == *(int *)corte) ? false : true;
 }
 
+void ABBNulo()
+{
+	abb_t *abb = NULL;
+	double decimal = 0.2;
+	double *obtener_decimal;
+	pa2m_afirmar(
+		abb_crear(NULL) == NULL,
+		"Crear un ABB, con una función comparativa NULL, retorna NULL");
+	pa2m_afirmar(abb_cantidad(abb) == 0,
+		     "Recibir un ABB nulo, retorna 0 en la función cantidad");
+	pa2m_afirmar(abb_insertar(abb, (void *)&decimal) == false,
+		     "Insertar, en un ABB nulo, retorna false");
+	pa2m_afirmar(abb_quitar(abb, (void *)&decimal,
+				(void **)&obtener_decimal) == false,
+		     "Quitar, en un ABB nulo, retorna false");
+	pa2m_afirmar(abb_obtener(abb, (void *)&decimal) == NULL,
+		     "Obtener, en un ABB nulo, retorna NULL");
+}
+
 void inicializarAbb()
 {
 	abb_t *abb = abb_crear(comparar_numeros);
@@ -465,9 +484,17 @@ void eliminarElementosConDosHijos()
 
 void iteradorInternoInorden()
 {
+	int sumador = 0;
+	pa2m_afirmar(abb_iterar_inorden(NULL, sumar_elementos,
+					(void *)&sumador) == 0,
+		     "ABB Nulo, el iterador interno Inorden retorna 0");
 	abb_t *abb = abb_crear(comparar_numeros);
 	if (!abb)
 		return;
+	pa2m_afirmar(
+		abb_iterar_inorden(abb, sumar_elementos, (void *)&sumador) == 0,
+		"Un abb sin elementos, el itrador interno Inorden retorna 0");
+
 	int numeros[] = { 20, 15, 9, 16, 25, 27, 19, 18 };
 	// recorrido: 9, 15, 16, 18, 19, 20, 25, 27
 	for (size_t i = 0; i < 8; i++) {
@@ -480,7 +507,6 @@ void iteradorInternoInorden()
 		abb_cantidad(abb) == 8,
 		"Nuevo abb. Hay 8 elementos: 20, 15, 9, 16, 25, 27, 19, 18");
 
-	int sumador = 0;
 	size_t cantidad;
 	cantidad = abb_iterar_inorden(abb, sumar_elementos, (void *)&sumador);
 	pa2m_afirmar(cantidad == 8, "Se iteró todos los elementos");
@@ -514,9 +540,18 @@ void iteradorInternoInorden()
 
 void iteradorInternoPreorden()
 {
+	int sumador = 0;
+	pa2m_afirmar(abb_iterar_preorden(NULL, sumar_elementos,
+					 (void *)&sumador) == 0,
+		     "ABB Nulo, el iterador interno Preorden retorna 0");
 	abb_t *abb = abb_crear(comparar_numeros);
 	if (!abb)
 		return;
+	pa2m_afirmar(
+		abb_iterar_preorden(abb, sumar_elementos, (void *)&sumador) ==
+			0,
+		"Un abb sin elementos, el itrador interno Preorden retorna 0");
+
 	int numeros[] = { 20, 15, 9, 16, 25, 27, 19, 18 };
 	// recorrido: 20, 15, 9, 16, 19, 18, 25, 27
 	for (size_t i = 0; i < 8; i++) {
@@ -529,7 +564,6 @@ void iteradorInternoPreorden()
 		abb_cantidad(abb) == 8,
 		"Nuevo abb. Hay 8 elementos: 20, 15, 9, 16, 25, 27, 19, 18");
 
-	int sumador = 0;
 	size_t cantidad;
 	cantidad = abb_iterar_preorden(abb, sumar_elementos, (void *)&sumador);
 	pa2m_afirmar(cantidad == 8, "Se iteró todos los elementos");
@@ -563,9 +597,18 @@ void iteradorInternoPreorden()
 
 void iteradorIternoPostorden()
 {
+	int sumador = 0;
+	pa2m_afirmar(abb_iterar_postorden(NULL, sumar_elementos,
+					  (void *)&sumador) == 0,
+		     "ABB Nulo, el iterador interno Postorden retorna 0");
 	abb_t *abb = abb_crear(comparar_numeros);
 	if (!abb)
 		return;
+	pa2m_afirmar(
+		abb_iterar_postorden(abb, sumar_elementos, (void *)&sumador) ==
+			0,
+		"Un abb sin elementos, el itrador interno Postorden retorna 0");
+
 	int numeros[] = { 20, 15, 9, 16, 25, 27, 19, 18 };
 	// recorrido: 9, 18, 19, 16, 15, 27, 25, 20
 	for (size_t i = 0; i < 8; i++) {
@@ -577,7 +620,6 @@ void iteradorIternoPostorden()
 	pa2m_afirmar(
 		abb_cantidad(abb) == 8,
 		"Nuevo abb. Hay 8 elementos: 20, 15, 9, 16, 25, 27, 19, 18");
-	int sumador = 0;
 	size_t cantidad;
 	cantidad = abb_iterar_postorden(abb, sumar_elementos, (void *)&sumador);
 	pa2m_afirmar(cantidad == 8, "Se iteró todos los elementos");
@@ -615,6 +657,10 @@ void vectorizarInorden()
 	if (!abb)
 		return;
 	int numeros[] = { 20, 15, 9, 16, 25, 27, 19, 18 };
+	pa2m_afirmar(abb_vectorizar_inorden(NULL, (void **)&numeros, 8) == 0,
+		     "Vectoriza Inorden con ABB nulo retorna 0");
+	pa2m_afirmar(abb_vectorizar_inorden(abb, NULL, 8) == 0,
+		     "Vectorizar Inorden con vector NULL, retorna 0");
 	int recorrido_esperado[] = { 9, 15, 16, 18, 19, 20, 25, 27 };
 	for (size_t i = 0; i < 8; i++) {
 		if (!abb_insertar(abb, (void *)&numeros[i])) {
@@ -675,6 +721,10 @@ void vectorizarPreorden()
 	if (!abb)
 		return;
 	int numeros[] = { 20, 15, 9, 16, 25, 27, 19, 18 };
+	pa2m_afirmar(abb_vectorizar_preorden(NULL, (void **)&numeros, 8) == 0,
+		     "Vectoriza Preorden con ABB nulo retorna 0");
+	pa2m_afirmar(abb_vectorizar_preorden(abb, NULL, 8) == 0,
+		     "Vectorizar Preorden con vector NULL, retorna 0");
 	int recorrido_esperado[] = { 20, 15, 9, 16, 19, 18, 25, 27 };
 	for (size_t i = 0; i < 8; i++) {
 		if (!abb_insertar(abb, (void *)&numeros[i])) {
@@ -735,6 +785,10 @@ void vectorizarPostorden()
 	if (!abb)
 		return;
 	int numeros[] = { 20, 15, 9, 16, 25, 27, 19, 18 };
+	pa2m_afirmar(abb_vectorizar_postorden(NULL, (void **)&numeros, 8) == 0,
+		     "Vectoriza Postorden con ABB nulo retorna 0");
+	pa2m_afirmar(abb_vectorizar_postorden(abb, NULL, 8) == 0,
+		     "Vectorizar Postorden con vector NULL, retorna 0");
 	int recorrido_esperado[] = { 9, 18, 19, 16, 15, 27, 25, 20 };
 	for (size_t i = 0; i < 8; i++) {
 		if (!abb_insertar(abb, (void *)&numeros[i])) {
@@ -793,6 +847,7 @@ int main()
 {
 	pa2m_nuevo_grupo(
 		"============== PRUEBA INICIALIZAR ABB ===============");
+	ABBNulo();
 	inicializarAbb();
 
 	pa2m_nuevo_grupo(
