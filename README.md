@@ -271,15 +271,15 @@ Volviendo al código del corte, hay 2 cortes:
 
 ¿Qué pasa aquí? Una vez que hallamos llegado al tope del vector, si es verdadero el lado izquierda, ya no entrará a la parte izquierda, ya que al ser un `or`, con verificar que la primera condición sea verdadera, es suficiente, ya que `or` tiene la propiedad de si alguna de las 2 es cierto, le es suficiente para que todo sea verdad, por eso cuando vamos iteración nodo por nodo, la condicón de la izquierda no se cumple, por eso entra a la condición de la derecha, como ambas no cumplen, no entra en la parte de `return false`, por ende, sigue iterando y aumentando la posición.
 
-Complejidades Algorirmicas de cada función:
+## Complejidades Algorirmicas de cada función:
 Con todo lo mencionado, para nuestra implementación de ABB, podemos dar las complejidades algoritmicas de cada función.
 
-`abb_crear`: `O(1)`
-`abb_insertar`: `O(n)`
-`abb_quitar`: `O(n)`
-`abb_obtener`: `O(n)`
-`abb_cantidad`: `O(1)`
-`abb_destruir`: `O(n)`, ya que liberará cada nodo que tenga el ABB.
-`abb_destruir_todo`: `O(n * f(g))`, siendo `f(g)` el elemento que tenga el nodo a eliminar, quizás es un ABB de Listas, entonces debemos liberar cada lista, que guardan `m` elementos.
-`Funciones de iteración`: `O(n * f(g))`, siendo `f(g)` dependiendo qué tipo de esructura es el elemento guardado, quizás una lista y la función es sumar todos lo elementos de cada lista según la iteración.
+`abb_crear`: `O(1)`  
+`abb_insertar`: `O(n)`  
+`abb_quitar`: `O(n)`  
+`abb_obtener`: `O(n)`  
+`abb_cantidad`: `O(1)`  
+`abb_destruir`: `O(n)`, ya que liberará cada nodo que tenga el ABB.  
+`abb_destruir_todo`: `O(n * f(g))`, siendo `f(g)` el elemento que tenga el nodo a eliminar, quizás es un ABB de Listas, entonces debemos liberar cada lista, que guardan `m` elementos.  
+`Funciones de iteración`: `O(n * f(g))`, siendo `f(g)` dependiendo qué tipo de esructura es el elemento guardado, quizás una lista y la función es sumar todos lo elementos de cada lista según la iteración.  
 `Funciones de Vectorización`: `O(n + m)`, debemos tener en cuenta que, aunque tengamos un tamaño `m` del vector, el máximo de elementos que vamos a poner, será la cantidad de elementos en el abb, osea, si tenemos un vector de 100 bloques, pero nuestro ABB tiene solo 5 elementos, solo se iterará y vectorizará esos 5 elementos, por ende, la funciones de vectorizar quedan en `O(n)`.
