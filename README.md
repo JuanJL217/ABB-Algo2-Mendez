@@ -27,33 +27,11 @@ valgrind ./tp_abb pokedex.csv
 
 ##  Funcionamiento
 
-Explicación de cómo funcionan las estructuras desarrolladas en el TP y el funcionamiento general del mismo.
-
-Aclarar en esta parte todas las decisiones que se tomaron al realizar el TP, cosas que no se aclaren en el enunciado, fragmentos de código que necesiten explicación extra, etc.
-
-Incluír **EN TODOS LOS TPS** los diagramas relevantes al problema (mayormente diagramas de memoria para explicar las estructuras, pero se pueden utilizar otros diagramas si es necesario).
-
-### Por ejemplo:
-
-El programa funciona abriendo el archivo pasado como parámetro y leyendolo línea por línea. Por cada línea crea un registro e intenta agregarlo al vector. La función de lectura intenta leer todo el archivo o hasta encontrar el primer error. Devuelve un vector con todos los registros creados.
+Se creó un programa que lee un archivo `.csv` y guarda todos los elementos en un Árbol Binario de Busqueda.  
+Así quedaría el Stack y Heap usando un ABB para ordenar Pokemones, usando `pokedex.csv`.
 
 <div align="center">
-<img width="70%" src="img/diagrama1.svg">
-</div>
-
-En el archivo `sarasa.c` la función `funcion1` utiliza `realloc` para agrandar la zona de memoria utilizada para conquistar el mundo. El resultado de `realloc` lo guardo en una variable auxiliar para no perder el puntero original en caso de error:
-
-```c
-int *vector = realloc(vector_original, (n+1)*sizeof(int));
-
-if(vector == NULL)
-    return -1;
-vector_original = vector;
-```
-
-
-<div align="center">
-<img width="70%" src="img/diagrama2.svg">
+<img width="70%" src="img/abb_pokemones.svg">
 </div>
 
 ---
@@ -117,22 +95,22 @@ Eliminar:
 Árbol Binario de Busqueda, tendrá la distinción de qué cosa es menor, igual o mayor. Como convención, lo menor irá a la izquierda, y lo mayor a la derecha.
 Tendré 2 criterios de ordenamiento: Balanceado y no Balanceado.
 
-`Insertar en abb no Balanceado`: Al tener un manejo de como acomodar las ramas para que haya un orden con mejor optimización, al ser que vamos a movernos por rama, o sea, elegir una de dos opciones, eso es un O(log(n)).
-`Insertar en abb Balanceado`: El peor de los casos es que se inserte de tal manera que parezca una lista, entonces será `O(n)`.
+`Insertar en abb no Balanceado`: El peor de los casos es que se inserte de tal manera que parezca una lista, entonces será `O(n)`.
+`Insertar en abb Balanceado`: Al tener un manejo de como acomodar las ramas para que haya un orden con mejor optimización, al ser que vamos a movernos por rama, o sea, siempre elegir una de dos opciones hasta llegar a nuestro elemento (en el no balanceado, no podríamos elegir entre 2 caminos, ya que si parece una lista, hay solo un recorrido, 1 sola opción), eso es un O(log(n)).
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_de_busqueda_insertar.png">
 </div>
 
-`Insertar en abb Balanceado: Buscará moviendose entre las ramas, por ende es `O(log(n))`.
 `Insertar en abb no Balanceado`: Al igual que insertar, el hecho de que puede quedar como una lista, y que busquemos el nodo del extremo, esta función se convierte en `O(n)`.
+`Insertar en abb Balanceado: Buscará moviendose entre las ramas (2 opciones), por ende es `O(log(n))`.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_de_busqueda_obtener.png">
 </div>
 
-`Eliminar en abb Balanceado`; Suponiendo que queremos eliminar un nodo que tiene 2 hijos, no puede suceder que el predecesor inorden este lejos, ya que no sería ALV, por ende, esto es `O(log(n))`.
 `Eliminar en abb no Balanceado`: Misma lógica, el peor caso es que borre el nodo del extremo, o también borrar un nodo con 2 hijos y que el nodo de su predecor inorden esté lejos, esto es `O(n)`.
+`Eliminar en abb Balanceado`; Suponiendo que queremos eliminar un nodo que tiene 2 hijos, al buscar el elemento predecesor, no va a recorrer 'todo el abb', ya que el arbol está rapetido de tal manera que esté todo balacandea, esto es `O(log(n))`.
 
 <div align="center">
 <img width="70%" src="img/arbol_binario_de_busqueda_eliminar.png">
